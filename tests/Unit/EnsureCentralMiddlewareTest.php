@@ -1,4 +1,10 @@
 <?php
+/*
+ By Uendel Silveira
+ Developer Web
+ IDE: PhpStorm
+ Created: 05/01/2026
+*/
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
