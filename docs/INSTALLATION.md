@@ -201,54 +201,75 @@ Se cada tenant tiver credenciais próprias de banco de dados:
 ```php
 <?php
 // app/Models/Tenant.php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use UendelSilveira\TenantCore\Contracts\TenantContract;
-use UendelSilveira\TenantCore\Contracts\TenantDatabaseCredentialsContract;
-
-class Tenant extends Model implements TenantContract, TenantDatabaseCredentialsContract
-{
-    protected $connection = 'central';
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'domain',
-        'database_name',
-        'database_host',
-        'database_port',
-        'database_username',
-        'database_password',
-    ];
-
-    protected $hidden = [
-        'database_password',
-    ];
-
-    // Métodos do TenantContract...
-
-    public function getTenantDatabaseHost(): ?string
+    namespace App\Models;
+    
+    use Illuminate\Database\Eloquent\Model;
+    use UendelSilveira\TenantCore\Contracts\TenantContract;
+    use UendelSilveira\TenantCore\Contracts\TenantDatabaseCredentialsContract;
+    
+    class Tenant extends Model implements TenantContract, TenantDatabaseCredentialsContract
     {
-        return $this->database_host;
+        protected $connection = 'central';
+        
+        protected $fillable = [
+            'name',
+            'slug',
+            'domain',
+            'database_name',
+            'database_host',
+            'database_port',
+            'database_username',
+            'database_password',
+        ];
+        
+        protected $hidden = [
+            'database_password',
+        ];
+        
+        // Métodos do TenantContract
+        public function getTenantKey(): string|int
+        {
+            return $this->id;
+        }
+        
+        public function getTenantSlug(): string
+        {
+            return $this->slug;
+        }
+        
+        public function getTenantDatabase(): string
+        {
+            return $this->database_name;
+        }
+        
+        public function getTenantDomain(): ?string
+        {
+            return $this->domain;
+        }
+        
+        // Métodos do TenantDatabaseCredentialsContract
+        
+        public function getTenantDatabaseHost(): ?string
+        {
+            return $this->database_host;
+        }
+        
+        public function getTenantDatabasePort(): ?int
+        {
+            return $this->database_port;
+        }
+        
+        public function getTenantDatabaseUsername(): ?string
+        {
+            return $this->database_username;
+        }
+        
+        public function getTenantDatabasePassword(): ?string
+        {
+            return $this->database_password;
+        }
     }
 
-    public function getTenantDatabasePort(): ?int
-    {
-        return $this->database_port;
-    }
-
-    public function getTenantDatabaseUsername(): ?string
-    {
-        return $this->database_username;
-    }
-
-    public function getTenantDatabasePassword(): ?string
-    {
-        return $this->database_password;
-    }
-}
 ```
 
 ---
