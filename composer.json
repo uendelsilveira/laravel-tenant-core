@@ -1,0 +1,27 @@
+{
+  "name": "uendelsilveira/laravel-tenant-core",
+  "description": "Infrastructure-only multi-tenant multi-database package for Laravel",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+	"php": "^8.2",
+	"illuminate/support": "^10.0|^11.0"
+  },
+  "autoload": {
+	"psr-4": {
+	  "uendelsilveira\\TenantCore\\": "src/"
+	},
+	"files": [
+	  "src/Helpers/helpers.php"
+	]
+  },
+  "extra": {
+	"laravel": {
+	  "providers": [
+		"uendelsilveira\\TenantCore\\TenantServiceProvider"
+	  ]
+	}
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
