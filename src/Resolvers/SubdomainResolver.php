@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -22,7 +23,7 @@ class SubdomainResolver implements TenantResolverContract
     {
         $subdomain = $this->extractSubdomain($request);
 
-        if (!$subdomain) {
+        if (! $subdomain) {
             return null;
         }
 
@@ -38,7 +39,7 @@ class SubdomainResolver implements TenantResolverContract
         $centralDomain = config('tenant.central_domain');
 
         // Remove the central domain to get the subdomain
-        $subdomain = str_replace('.' . $centralDomain, '', $host);
+        $subdomain = str_replace('.'.$centralDomain, '', $host);
 
         // If subdomain is the same as host or equals central domain, no tenant
         if ($subdomain === $host || $subdomain === $centralDomain || empty($subdomain)) {
@@ -53,7 +54,7 @@ class SubdomainResolver implements TenantResolverContract
      */
     protected function findTenant(string $subdomain): ?TenantContract
     {
-        if (!config('tenant.cache.enabled', true)) {
+        if (! config('tenant.cache.enabled', true)) {
             return $this->queryTenant($subdomain);
         }
 
@@ -85,7 +86,7 @@ class SubdomainResolver implements TenantResolverContract
     protected function getCacheKey(string $subdomain): string
     {
         $prefix = config('tenant.cache.prefix', 'tenant');
+
         return "{$prefix}:domain:{$subdomain}";
     }
 }
-

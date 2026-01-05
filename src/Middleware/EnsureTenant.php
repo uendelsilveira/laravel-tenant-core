@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -23,9 +24,6 @@ class EnsureTenant
      * Handle an incoming request.
      * Ensures a tenant is present in the context.
      *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
      * @throws NotFoundHttpException
      */
     public function handle(Request $request, Closure $next): mixed

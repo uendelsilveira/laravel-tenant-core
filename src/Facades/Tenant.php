@@ -1,10 +1,11 @@
 <?php
-	/*
-	 By Uendel Silveira
-	 Developer Web
-	 IDE: PhpStorm
-	 Created at: 05/01/26
-	*/
+
+/*
+ By Uendel Silveira
+ Developer Web
+ IDE: PhpStorm
+ Created at: 05/01/26
+*/
 
 namespace UendelSilveira\TenantCore\Facades;
 
@@ -21,5 +22,8 @@ use Illuminate\Support\Facades\Facade;
  */
 class Tenant extends Facade
 {
-    protected static function getFacadeAccessor(): string { return 'tenant'; }
+    protected static function getFacadeAccessor(): string
+    {
+        return 'tenant';
+    }
 }

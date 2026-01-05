@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -23,14 +24,11 @@ class EnsureCentral
      * Handle an incoming request.
      * Ensures NO tenant is present in the context (central domain only).
      *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
      * @throws AccessDeniedHttpException
      */
     public function handle(Request $request, Closure $next): mixed
     {
-        if (!$this->context->isCentral()) {
+        if (! $this->context->isCentral()) {
             throw new AccessDeniedHttpException('This route is only accessible from the central domain.');
         }
 

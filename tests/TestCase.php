@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -44,4 +45,3 @@ abstract class TestCase extends Orchestra
         $app['config']->set('tenant.cache.enabled', false);
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -18,11 +19,8 @@ class TenantBooted
 
     /**
      * Create a new event instance.
-     *
-     * @param TenantContract $tenant
      */
     public function __construct(
         public TenantContract $tenant
     ) {}
 }
-

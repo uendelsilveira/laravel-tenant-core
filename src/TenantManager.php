@@ -1,10 +1,11 @@
 <?php
-	/*
-	 By Uendel Silveira
-	 Developer Web
-	 IDE: PhpStorm
-	 Created at: 05/01/26
-	*/
+
+/*
+ By Uendel Silveira
+ Developer Web
+ IDE: PhpStorm
+ Created at: 05/01/26
+*/
 
 namespace UendelSilveira\TenantCore;
 
@@ -39,6 +40,6 @@ class TenantManager
 
     public function isTenant(): bool
     {
-        return !$this->isCentral();
+        return ! $this->isCentral();
     }
 }

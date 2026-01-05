@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -23,7 +24,7 @@ class PathResolver implements TenantResolverContract
     {
         $tenantSlug = $this->extractSlug($request);
 
-        if (!$tenantSlug) {
+        if (! $tenantSlug) {
             return null;
         }
 
@@ -49,7 +50,7 @@ class PathResolver implements TenantResolverContract
      */
     protected function findTenant(string $slug): ?TenantContract
     {
-        if (!config('tenant.cache.enabled', true)) {
+        if (! config('tenant.cache.enabled', true)) {
             return $this->queryTenant($slug);
         }
 
@@ -81,7 +82,7 @@ class PathResolver implements TenantResolverContract
     protected function getCacheKey(string $slug): string
     {
         $prefix = config('tenant.cache.prefix', 'tenant');
+
         return "{$prefix}:slug:{$slug}";
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -10,6 +11,4 @@ namespace UendelSilveira\TenantCore\Exceptions;
 
 use Exception;
 
-class TenantException extends Exception
-{
-}
+class TenantException extends Exception {}

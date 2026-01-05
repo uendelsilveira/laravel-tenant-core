@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -27,7 +28,7 @@ class HeaderResolver implements TenantResolverContract
         $tenantId = $request->header($headerName);
         $tenantSlug = $request->header($headerSlugName);
 
-        if (!$tenantId && !$tenantSlug) {
+        if (! $tenantId && ! $tenantSlug) {
             return null;
         }
 
@@ -43,7 +44,7 @@ class HeaderResolver implements TenantResolverContract
      */
     protected function findTenantById(string|int $id): ?TenantContract
     {
-        if (!config('tenant.cache.enabled', true)) {
+        if (! config('tenant.cache.enabled', true)) {
             return $this->queryTenantById($id);
         }
 
@@ -61,7 +62,7 @@ class HeaderResolver implements TenantResolverContract
      */
     protected function findTenantBySlug(string $slug): ?TenantContract
     {
-        if (!config('tenant.cache.enabled', true)) {
+        if (! config('tenant.cache.enabled', true)) {
             return $this->queryTenantBySlug($slug);
         }
 
@@ -106,7 +107,7 @@ class HeaderResolver implements TenantResolverContract
     protected function getCacheKey(string $type, string|int $value): string
     {
         $prefix = config('tenant.cache.prefix', 'tenant');
+
         return "{$prefix}:{$type}:{$value}";
     }
 }
-

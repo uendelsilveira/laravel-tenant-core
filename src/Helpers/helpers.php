@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -9,7 +10,7 @@
 use UendelSilveira\TenantCore\Contracts\TenantContract;
 use UendelSilveira\TenantCore\Facades\Tenant;
 
-if (!function_exists('tenant')) {
+if (! function_exists('tenant')) {
     /**
      * Get the tenant manager instance or current tenant.
      *
@@ -21,7 +22,7 @@ if (!function_exists('tenant')) {
     }
 }
 
-if (!function_exists('tenant_current')) {
+if (! function_exists('tenant_current')) {
     /**
      * Get the current tenant.
      */
@@ -31,7 +32,7 @@ if (!function_exists('tenant_current')) {
     }
 }
 
-if (!function_exists('tenant_key')) {
+if (! function_exists('tenant_key')) {
     /**
      * Get the current tenant's key.
      */
@@ -41,7 +42,7 @@ if (!function_exists('tenant_key')) {
     }
 }
 
-if (!function_exists('tenant_slug')) {
+if (! function_exists('tenant_slug')) {
     /**
      * Get the current tenant's slug.
      */
@@ -51,7 +52,7 @@ if (!function_exists('tenant_slug')) {
     }
 }
 
-if (!function_exists('is_central')) {
+if (! function_exists('is_central')) {
     /**
      * Check if the current context is central (no tenant).
      */
@@ -61,7 +62,7 @@ if (!function_exists('is_central')) {
     }
 }
 
-if (!function_exists('is_tenant')) {
+if (! function_exists('is_tenant')) {
     /**
      * Check if the current context has a tenant.
      */
@@ -72,7 +73,7 @@ if (!function_exists('is_tenant')) {
 }
 
 // Keep old function names for backwards compatibility
-if (!function_exists('tenant_is_central')) {
+if (! function_exists('tenant_is_central')) {
     /**
      * @deprecated Use is_central() instead
      */
@@ -82,7 +83,7 @@ if (!function_exists('tenant_is_central')) {
     }
 }
 
-if (!function_exists('tenant_is_tenant')) {
+if (! function_exists('tenant_is_tenant')) {
     /**
      * @deprecated Use is_tenant() instead
      */

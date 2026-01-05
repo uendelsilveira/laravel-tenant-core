@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -37,4 +38,3 @@ class Tenant extends Model implements TenantContract
         return $this->domain;
     }
 }
-

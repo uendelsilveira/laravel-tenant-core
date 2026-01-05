@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -22,7 +23,7 @@ class HeaderResolverTest extends TestCase
     {
         parent::setUp();
         $this->resolver = new HeaderResolver();
-        
+
         // Create tenants table
         Schema::connection('central')->create('tenants', function ($table) {
             $table->id();
@@ -40,14 +41,14 @@ class HeaderResolverTest extends TestCase
             'id' => 1,
             'slug' => 'acme',
             'domain' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => 'tenant_acme',
         ]);
 
         $request = Request::create('http://example.com/api/test');
         $request->headers->set('X-Tenant-ID', '1');
-        
+
         $tenant = $this->resolver->resolve($request);
-        
+
         $this->assertNotNull($tenant);
         $this->assertEquals(1, $tenant->id);
     }
@@ -60,14 +61,14 @@ class HeaderResolverTest extends TestCase
             'id' => 1,
             'slug' => 'acme',
             'domain' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => 'tenant_acme',
         ]);
 
         $request = Request::create('http://example.com/api/test');
         $request->headers->set('X-Tenant-Slug', 'acme');
-        
+
         $tenant = $this->resolver->resolve($request);
-        
+
         $this->assertNotNull($tenant);
         $this->assertEquals('acme', $tenant->slug);
     }
@@ -76,9 +77,9 @@ class HeaderResolverTest extends TestCase
     public function it_returns_null_when_no_header_present(): void
     {
         $request = Request::create('http://example.com/api/test');
-        
+
         $tenant = $this->resolver->resolve($request);
-        
+
         $this->assertNull($tenant);
     }
 
@@ -87,10 +88,9 @@ class HeaderResolverTest extends TestCase
     {
         $request = Request::create('http://example.com/api/test');
         $request->headers->set('X-Tenant-ID', '999');
-        
+
         $tenant = $this->resolver->resolve($request);
-        
+
         $this->assertNull($tenant);
     }
 }
-

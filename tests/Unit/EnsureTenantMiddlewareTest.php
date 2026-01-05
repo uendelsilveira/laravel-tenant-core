@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -23,7 +24,7 @@ class EnsureTenantMiddlewareTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => 'tenant_acme',
         ]);
 
         $context = app(TenantContextContract::class);
@@ -54,4 +55,3 @@ class EnsureTenantMiddlewareTest extends TestCase
         });
     }
 }
-

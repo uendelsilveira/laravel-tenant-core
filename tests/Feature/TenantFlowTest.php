@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -40,7 +41,7 @@ class TenantFlowTest extends TestCase
             'id' => 1,
             'slug' => 'acme',
             'domain' => 'acme',
-            'database_name' => ':memory:'
+            'database_name' => ':memory:',
         ]);
     }
 
@@ -112,4 +113,3 @@ class TenantFlowTest extends TestCase
         Event::assertNotDispatched(TenantEnded::class);
     }
 }
-

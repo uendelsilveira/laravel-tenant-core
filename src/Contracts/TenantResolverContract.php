@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -14,10 +15,6 @@ interface TenantResolverContract
 {
     /**
      * Resolve the tenant from the given request.
-     *
-     * @param Request $request
-     * @return TenantContract|null
      */
     public function resolve(Request $request): ?TenantContract;
 }
-

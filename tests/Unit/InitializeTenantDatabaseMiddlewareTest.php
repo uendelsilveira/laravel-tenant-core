@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -29,7 +30,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'acme',
-            'database_name' => ':memory:'
+            'database_name' => ':memory:',
         ]);
 
         $context = app(TenantContextContract::class);
@@ -43,6 +44,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         $middleware->handle($request, function ($req) {
             // During request, should be connected to tenant
             $this->assertEquals('tenant', DB::getDefaultConnection());
+
             return response('OK');
         });
 
@@ -67,6 +69,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         $middleware->handle($request, function ($req) {
             // Should remain on central
             $this->assertEquals('central', DB::getDefaultConnection());
+
             return response('OK');
         });
 
@@ -76,4 +79,3 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         Event::assertNotDispatched(TenantEnded::class);
     }
 }
-

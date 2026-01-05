@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -28,19 +29,19 @@ class ResolverFactory
             'header' => HeaderResolver::class,
         ]);
 
-        if (!isset($drivers[$type])) {
+        if (! isset($drivers[$type])) {
             throw new InvalidResolverException($type);
         }
 
         $resolverClass = $drivers[$type];
 
-        if (!class_exists($resolverClass)) {
+        if (! class_exists($resolverClass)) {
             throw new InvalidResolverException($type);
         }
 
         $resolver = app($resolverClass);
 
-        if (!$resolver instanceof TenantResolverContract) {
+        if (! $resolver instanceof TenantResolverContract) {
             throw new InvalidResolverException(
                 "{$resolverClass} must implement TenantResolverContract"
             );
@@ -49,4 +50,3 @@ class ResolverFactory
         return $resolver;
     }
 }
-

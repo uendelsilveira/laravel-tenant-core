@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -30,7 +31,7 @@ class TenantDatabaseManagerTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'test-tenant',
-            'database_name' => ':memory:'
+            'database_name' => ':memory:',
         ]);
 
         $this->manager->connect($tenant);
@@ -45,7 +46,7 @@ class TenantDatabaseManagerTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'test-tenant',
-            'database_name' => ':memory:'
+            'database_name' => ':memory:',
         ]);
 
         // First connect
@@ -65,10 +66,9 @@ class TenantDatabaseManagerTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'test-tenant',
-            'database_name' => ''
+            'database_name' => '',
         ]);
 
         $this->manager->connect($tenant);
     }
 }
-

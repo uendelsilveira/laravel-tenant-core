@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -14,7 +15,7 @@ class TenantNotFoundException extends TenantException
     {
         $message = $identifier
             ? "Tenant not found: {$identifier}"
-            : "Tenant not found.";
+            : 'Tenant not found.';
 
         parent::__construct($message, $code, $previous);
     }

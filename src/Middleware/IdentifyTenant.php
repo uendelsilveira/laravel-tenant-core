@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -22,10 +23,6 @@ class IdentifyTenant
 
     /**
      * Handle an incoming request.
-     *
-     * @param Request $request
-     * @param Closure $next
-     * @return mixed
      */
     public function handle(Request $request, Closure $next): mixed
     {

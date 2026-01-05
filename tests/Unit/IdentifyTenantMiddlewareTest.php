@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -22,7 +23,7 @@ class IdentifyTenantMiddlewareTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create tenants table
         Schema::connection('central')->create('tenants', function ($table) {
             $table->id();
@@ -36,13 +37,13 @@ class IdentifyTenantMiddlewareTest extends TestCase
     public function it_identifies_tenant_and_sets_context(): void
     {
         Event::fake();
-        
+
         // Create a test tenant
         Tenant::on('central')->create([
             'id' => 1,
             'slug' => 'acme',
             'domain' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => 'tenant_acme',
         ]);
 
         $request = Request::create('http://acme.example.com/test');
@@ -55,7 +56,7 @@ class IdentifyTenantMiddlewareTest extends TestCase
 
         $this->assertNotNull($context->get());
         $this->assertEquals('acme', $context->get()->domain);
-        
+
         Event::assertDispatched(TenantResolved::class);
     }
 
@@ -63,7 +64,7 @@ class IdentifyTenantMiddlewareTest extends TestCase
     public function it_does_not_set_context_for_central_domain(): void
     {
         Event::fake();
-        
+
         $request = Request::create('http://example.com/test');
         $context = app(TenantContextContract::class);
         $middleware = new IdentifyTenant($context);
@@ -74,8 +75,7 @@ class IdentifyTenantMiddlewareTest extends TestCase
 
         $this->assertNull($context->get());
         $this->assertTrue($context->isCentral());
-        
+
         Event::assertNotDispatched(TenantResolved::class);
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -8,13 +9,12 @@
 
 namespace UendelSilveira\TenantCore\Providers;
 
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use UendelSilveira\TenantCore\Context\TenantContext;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
 use UendelSilveira\TenantCore\Contracts\TenantDatabaseManagerContract;
 use UendelSilveira\TenantCore\Contracts\TenantResolverContract;
-use UendelSilveira\TenantCore\Context\TenantContext;
 use UendelSilveira\TenantCore\Database\TenantDatabaseManager;
 use UendelSilveira\TenantCore\Middleware\EnsureCentral;
 use UendelSilveira\TenantCore\Middleware\EnsureTenant;
@@ -27,7 +27,7 @@ class TenantServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../../config/tenant.php', 'tenant');
+        $this->mergeConfigFrom(__DIR__.'/../../config/tenant.php', 'tenant');
 
         $this->registerContext();
         $this->registerDatabaseManager();
@@ -38,7 +38,7 @@ class TenantServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/../../config/tenant.php' => config_path('tenant.php'),
+            __DIR__.'/../../config/tenant.php' => config_path('tenant.php'),
         ], 'tenant-config');
 
         $this->registerMiddleware();
@@ -115,7 +115,7 @@ class TenantServiceProvider extends ServiceProvider
      */
     protected function registerOctaneSupport(): void
     {
-        if (!class_exists(\Laravel\Octane\Events\RequestTerminated::class)) {
+        if (! class_exists(\Laravel\Octane\Events\RequestTerminated::class)) {
             return;
         }
 

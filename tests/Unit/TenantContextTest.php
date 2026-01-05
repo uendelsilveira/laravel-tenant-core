@@ -1,4 +1,5 @@
 <?php
+
 /*
  By Uendel Silveira
  Developer Web
@@ -33,9 +34,9 @@ class TenantContextTest extends TestCase
     public function it_can_set_a_tenant(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);
-        
+
         $this->context->set($tenant);
-        
+
         $this->assertSame($tenant, $this->context->get());
         $this->assertFalse($this->context->isCentral());
     }
@@ -44,12 +45,12 @@ class TenantContextTest extends TestCase
     public function it_can_clear_tenant(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);
-        
+
         $this->context->set($tenant);
         $this->assertNotNull($this->context->get());
-        
+
         $this->context->clear();
-        
+
         $this->assertNull($this->context->get());
         $this->assertTrue($this->context->isCentral());
     }
@@ -58,14 +59,13 @@ class TenantContextTest extends TestCase
     public function it_can_set_tenant_to_null(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);
-        
+
         $this->context->set($tenant);
         $this->assertNotNull($this->context->get());
-        
+
         $this->context->set(null);
-        
+
         $this->assertNull($this->context->get());
         $this->assertTrue($this->context->isCentral());
     }
 }
-
