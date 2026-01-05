@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Create Release
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
