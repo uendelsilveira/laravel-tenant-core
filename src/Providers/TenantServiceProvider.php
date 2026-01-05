@@ -41,6 +41,16 @@ class TenantServiceProvider extends ServiceProvider
             __DIR__.'/../../config/tenant.php' => config_path('tenant.php'),
         ], 'tenant-config');
 
+        $this->commands([
+            \UendelSilveira\TenantCore\Console\TenantListCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantCreateCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantMigrateCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantMigrateFreshCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantMigrateRollbackCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantSeedCommand::class,
+            \UendelSilveira\TenantCore\Console\TenantRunCommand::class,
+        ]);
+
         $this->publishes([
             __DIR__.'/../../database/migrations/central' => database_path('migrations/central'),
         ], 'tenant-migrations');
