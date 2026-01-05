@@ -41,6 +41,25 @@ class TenantServiceProvider extends ServiceProvider
             __DIR__.'/../../config/tenant.php' => config_path('tenant.php'),
         ], 'tenant-config');
 
+        $this->publishes([
+            __DIR__.'/../../database/migrations/central' => database_path('migrations/central'),
+        ], 'tenant-migrations');
+
+        $this->publishes([
+            __DIR__.'/../../stubs/Tenant.php' => app_path('Models/Tenant.php'),
+            __DIR__.'/../../stubs/Domain.php' => app_path('Models/Domain.php'),
+            __DIR__.'/../../stubs/SystemUser.php' => app_path('Models/SystemUser.php'),
+        ], 'tenant-model');
+
+        $this->publishes([
+            __DIR__.'/../../stubs/tenant.php' => base_path('routes/tenant.php'),
+            __DIR__.'/../../stubs/central.php' => base_path('routes/central.php'),
+        ], 'tenant-routes');
+
+        $this->publishes([
+            __DIR__.'/../../database/seeders' => database_path('seeders'),
+        ], 'tenant-seeders');
+
         $this->registerMiddleware();
         $this->registerOctaneSupport();
     }

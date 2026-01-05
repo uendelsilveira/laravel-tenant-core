@@ -69,6 +69,7 @@ class SubdomainResolver implements TenantResolverContract
 
     /**
      * Query the tenant from the database.
+     * Searches through the domains relationship.
      */
     protected function queryTenant(string $subdomain): ?TenantContract
     {
@@ -76,7 +77,9 @@ class SubdomainResolver implements TenantResolverContract
         $connection = config('tenant.connections.central', 'central');
 
         return $tenantModel::on($connection)
-            ->where('domain', $subdomain)
+            ->whereHas('domains', function ($query) use ($subdomain) {
+                $query->where('domain', $subdomain);
+            })
             ->first();
     }
 
