@@ -9,12 +9,11 @@
 
 namespace UendelSilveira\TenantCore\Tests\Feature;
 
-use PHPUnit\Framework\Attributes\Test;
-
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\Test;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
 use UendelSilveira\TenantCore\Events\TenantBooted;
 use UendelSilveira\TenantCore\Events\TenantEnded;

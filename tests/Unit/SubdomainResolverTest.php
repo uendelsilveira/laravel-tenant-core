@@ -9,10 +9,9 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\Test;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\Test;
 use UendelSilveira\TenantCore\Resolvers\SubdomainResolver;
 use UendelSilveira\TenantCore\Tests\Fixtures\Domain;
 use UendelSilveira\TenantCore\Tests\Fixtures\Tenant;

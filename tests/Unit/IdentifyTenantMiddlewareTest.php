@@ -9,11 +9,10 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\Test;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\Test;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
 use UendelSilveira\TenantCore\Events\TenantResolved;
 use UendelSilveira\TenantCore\Middleware\IdentifyTenant;

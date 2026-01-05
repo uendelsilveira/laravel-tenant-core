@@ -9,9 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\Test;
-
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
 use UendelSilveira\TenantCore\Middleware\EnsureCentral;

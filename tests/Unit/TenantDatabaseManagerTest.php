@@ -9,10 +9,9 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\Test;
-
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 use UendelSilveira\TenantCore\Database\TenantDatabaseManager;
 use UendelSilveira\TenantCore\Tests\Fixtures\Tenant;
 use UendelSilveira\TenantCore\Tests\TestCase;
