@@ -7,15 +7,17 @@ This package provides the essential infrastructure to build multi-tenant applica
 ## 🚀 Features
 
 - **Multi-Database Architecture**: Complete data isolation with one database per tenant.
-- **Subdomain Resolution**: Automatically identifies tenants based on subdomains.
+- **Multiple Resolvers**: Identify tenants via subdomain, path, or HTTP header.
 - **Context Management**: Global access to the current tenant context via Facade and Helper.
-- **Middleware Integration**: Ready-to-use middleware for tenant identification and database initialization.
+- **Middleware Integration**: Ready-to-use middleware groups for tenant and central routes.
 - **Event Driven**: Dispatches events during the tenant lifecycle (Resolved, Booted, Ended).
+- **Caching**: Built-in tenant lookup caching for improved performance.
+- **Laravel Octane Support**: Automatic context cleanup between requests.
 - **Agnostic**: No built-in authentication, UI, or business logic. You build your app your way.
 
 ## 📦 Installation
 
-Requires PHP 8.5+ and Laravel 10.0+ or 11.0+.
+Requires PHP 8.2+ and Laravel 10.0+ or 11.0+.
 
 ```bash
 composer require uendelsilveira/laravel-tenant-core
@@ -26,46 +28,61 @@ composer require uendelsilveira/laravel-tenant-core
 Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="UendelSilveira\TenantCore\Providers\TenantServiceProvider"
+php artisan vendor:publish --tag=tenant-config
 ```
 
-This will create a `config/tenant.php` file. Configure your central domain and tenant model:
+This will create a `config/tenant.php` file.
 
-```php
-return [
-    'central_domain' => env('TENANT_CENTRAL_DOMAIN', 'yourdomain.com'),
-    
-    'tenant_model' => App\Models\Tenant::class,
-    
-    'connections' => [
-        'central' => 'central',
-        'tenant' => 'tenant',
-    ],
-    
-    'resolver' => [
-        'type' => 'subdomain',
-    ],
-];
+### Environment Variables
+
+Copy the variables from [.tenant-example.env](.tenant-example.env) to your `.env` file:
+
+```env
+# Domain
+TENANT_CENTRAL_DOMAIN=example.com
+
+# Database Connections
+TENANT_CONNECTION_CENTRAL=central
+TENANT_CONNECTION_TENANT=tenant
+
+# Resolver (subdomain, path, header)
+TENANT_RESOLVER=subdomain
+TENANT_HEADER_NAME=X-Tenant-ID
+TENANT_HEADER_SLUG_NAME=X-Tenant-Slug
+
+# Cache
+TENANT_CACHE_ENABLED=true
+TENANT_CACHE_TTL=3600
+TENANT_CACHE_STORE=
 ```
 
-Ensure you have configured your database connections in `config/database.php`. You need at least one connection for the central database and a template connection for tenants.
+Ensure you have configured your database connections in `config/database.php`.
 
 ## 🛠 Usage
 
-### Middleware
+### Middleware Groups
 
-Register the middleware in your `app/Http/Kernel.php` (Laravel 10) or `bootstrap/app.php` (Laravel 11) and superiors.
+The package registers two middleware groups automatically:
 
-**For Tenant Routes:**
-Apply the `IdentifyTenant` middleware to routes that should be accessible only to tenants.
-
+**For Tenant Routes** (requires tenant context):
 ```php
-use UendelSilveira\TenantCore\Middleware\IdentifyTenant;
-
-Route::middleware([IdentifyTenant::class])->group(function () {
-    // Your tenant routes here
+Route::middleware('tenant')->group(function () {
+    Route::get('/dashboard', DashboardController::class);
 });
 ```
+
+**For Central Routes** (no tenant allowed):
+```php
+Route::middleware('central')->group(function () {
+    Route::get('/admin', AdminController::class);
+});
+```
+
+**Available Middleware Aliases:**
+- `tenant.identify` - Identifies the tenant from the request
+- `tenant.database` - Initializes the tenant database connection
+- `tenant.ensure` - Ensures a tenant exists (404 if not)
+- `tenant.central` - Ensures no tenant exists (403 if tenant present)
 
 ### Helpers & Facade
 
@@ -76,21 +93,29 @@ use UendelSilveira\TenantCore\Facades\Tenant;
 
 // Get current tenant
 $tenant = tenant_current();
+// or
+$tenant = Tenant::current();
+
+// Get tenant key
+$id = tenant_key();
+
+// Get tenant slug
+$slug = tenant_slug();
 
 // Check if context is tenant
-if (tenant_is_tenant()) {
-    // ...
+if (is_tenant()) {
+    // In tenant context
 }
 
 // Check if context is central
-if (tenant_is_central()) {
-    // ...
+if (is_central()) {
+    // In central context
 }
 ```
 
 ### Tenant Model
 
-Your Tenant model should implement the `TenantContract`.
+Your Tenant model must implement the `TenantContract` interface:
 
 ```php
 namespace App\Models;
@@ -105,21 +130,44 @@ class Tenant extends Model implements TenantContract
         return $this->id;
     }
 
-    public function getTenantName(): string
+    public function getTenantSlug(): string
     {
-        return $this->name;
+        return $this->slug;
     }
 
-    public function getTenantDomain(): string
-    {
-        return $this->domain;
-    }
-
-    public function getTenantDatabaseName(): string
+    public function getTenantDatabase(): string
     {
         return $this->database_name;
     }
-    
+
+    public function getTenantDomain(): ?string
+    {
+        return $this->domain;
+    }
+}
+```
+
+**Optional: Custom Database Credentials**
+
+If each tenant has its own database credentials, implement `TenantDatabaseCredentialsContract`:
+
+```php
+use UendelSilveira\TenantCore\Contracts\TenantDatabaseCredentialsContract;
+
+class Tenant extends Model implements TenantContract, TenantDatabaseCredentialsContract
+{
+    // ... TenantContract methods ...
+
+    public function getTenantDatabaseHost(): ?string
+    {
+        return $this->database_host;
+    }
+
+    public function getTenantDatabasePort(): ?int
+    {
+        return $this->database_port;
+    }
+
     public function getTenantDatabaseUsername(): ?string
     {
         return $this->database_username;
@@ -132,14 +180,35 @@ class Tenant extends Model implements TenantContract
 }
 ```
 
+### Events
+
+The package dispatches the following events during the tenant lifecycle:
+
+- `TenantResolved` - When a tenant is identified from the request
+- `TenantBooted` - When the tenant database connection is established
+- `TenantEnded` - When the request completes and tenant context is cleared
+
+```php
+// In your EventServiceProvider
+protected $listen = [
+    \UendelSilveira\TenantCore\Events\TenantResolved::class => [
+        \App\Listeners\LogTenantAccess::class,
+    ],
+    \UendelSilveira\TenantCore\Events\TenantBooted::class => [
+        \App\Listeners\SetupTenantResources::class,
+    ],
+];
+```
+
 ## 🏗 Architecture & Boundaries
 
 This package strictly follows the principle that **infrastructure should not contain application rules**.
 
 **What is included:**
-- Tenant resolution
+- Tenant resolution (subdomain, path, header)
 - Database connection switching
-- Execution context
+- Execution context management
+- Lifecycle events
 
 **What is NOT included:**
 - Authentication / Authorization
@@ -152,3 +221,10 @@ For a detailed explanation of the architectural boundaries, please refer to [doc
 ## 📄 License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
+## 👨‍💻 Autor
+
+**Uendel Silveira**
+* 📧 [uendel.silveira@gmail.com](mailto:uendel.silveira@gmail.com)
+* 🔗 [LinkedIn](https://linkedin.com/in/uendelsilveira)
+* 🐙 [GitHub](https://github.com/uendelsilveira)
