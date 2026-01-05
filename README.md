@@ -1,244 +1,101 @@
 # Laravel Tenant Core
 
-Infrastructure-only multi-tenant multi-database package for Laravel.
+Infrastructure-only multi-tenant package for Laravel using a multi-database approach.
 
-This package provides the essential infrastructure to build multi-tenant applications using a multi-database approach (one database per tenant). It focuses strictly on tenant resolution, database connection switching, and context management, leaving application-specific logic (authentication, authorization, UI, business rules) to the consuming application.
+## Features
 
-## 🚀 Features
+- Multi-database architecture (one database per tenant)
+- Multiple tenant resolvers (subdomain, path, header)
+- Middleware groups for tenant and central routes
+- Event-driven lifecycle (TenantResolved, TenantBooted, TenantEnded)
+- Built-in caching and Laravel Octane support
+- Infrastructure only - no authentication, authorization, or UI
 
-- **Multi-Database Architecture**: Complete data isolation with one database per tenant.
-- **Multiple Resolvers**: Identify tenants via subdomain, path, or HTTP header.
-- **Context Management**: Global access to the current tenant context via Facade and Helper.
-- **Middleware Integration**: Ready-to-use middleware groups for tenant and central routes.
-- **Event Driven**: Dispatches events during the tenant lifecycle (Resolved, Booted, Ended).
-- **Caching**: Built-in tenant lookup caching for improved performance.
-- **Laravel Octane Support**: Automatic context cleanup between requests.
-- **Agnostic**: No built-in authentication, UI, or business logic. You build your app your way.
+## Requirements
 
-## 📖 Documentation
+- PHP 8.2+
+- Laravel 10.x, 11.x, or 12.x
+- MySQL, PostgreSQL, or SQLite
 
-- **[Installation Guide](docs/INSTALLATION.md)** - Complete step-by-step installation tutorial
-- **[Environment Variables](.tenant-example.env)** - All available configuration options
-
-## 📦 Quick Installation
-
-Requires PHP 8.2+ and Laravel 10.x, 11.x or 12.x.
+## Installation
 
 ```bash
 composer require uendelsilveira/laravel-tenant-core
 ```
 
-**Publish configuration:**
+**Publish all assets:**
+
 ```bash
-php artisan vendor:publish --tag=tenant-config
+php artisan vendor:publish --provider="UendelSilveira\\TenantCore\\Providers\\TenantServiceProvider"
 ```
 
-**Publish migrations (optional but recommended):**
-```bash
-php artisan vendor:publish --tag=tenant-migrations
-```
+This publishes:
+- Configuration (`config/tenant.php`)
+- Migrations (central and tenant)
+- Models (`Tenant`, `Domain`, `SystemUser`)
+- Routes (`routes/tenant.php`, `routes/central.php`)
+- Seeders (example tenant and SuperAdmin)
 
-**Publish models (optional but recommended):**
-```bash
-php artisan vendor:publish --tag=tenant-model
-```
-This publishes: `Tenant.php`, `Domain.php`, `SystemUser.php`
-
-> ⚠️ **Note:** The `User` model is NOT published to avoid conflicts with Laravel's default User model. See installation docs for how to configure your existing User model for the central database.
-
-**Publish route files (optional but recommended):**
-```bash
-php artisan vendor:publish --tag=tenant-routes
-```
-
-**Publish seeders (optional - includes example tenant and SuperAdmin):**
-```bash
-php artisan vendor:publish --tag=tenant-seeders
-```
-
-**Or publish everything at once:**
-```bash
-php artisan vendor:publish --provider="UendelSilveira\TenantCore\Providers\TenantServiceProvider"
-```
-
-**Quick Start (with example data):**
-```bash
-# Run central migrations
-php artisan migrate --database=central --path=database/migrations/central
-
-# Seed example tenant and SuperAdmin
-php artisan db:seed --database=central
-
-# Create tenant database
-mysql -e "CREATE DATABASE tenant_foo;"
-
-# Run tenant migrations
-php artisan migrate --database=tenant --path=database/migrations/tenant
-```
-
-Example credentials after seeding:
-- **SuperAdmin (Central)**: mail@example.com / 123456
-- **Example Tenant**: foo.localhost (database: tenant_foo)
-
-> 📘 For a complete installation guide with database setup, model creation, and route configuration, see **[docs/INSTALLATION.md](docs/INSTALLATION.md)**.
-
-## ⚙️ Configuration
-
-Copy the variables from [.tenant-example.env](.tenant-example.env) to your `.env` file:
+**Configure your `.env`:**
 
 ```env
-# Domain
-TENANT_CENTRAL_DOMAIN=example.com
+DB_DATABASE_CENTRAL=central
 
-# Database Connections
+TENANT_CENTRAL_DOMAIN=localhost
 TENANT_CONNECTION_CENTRAL=central
 TENANT_CONNECTION_TENANT=tenant
-
-# Resolver (subdomain, path, header)
 TENANT_RESOLVER=subdomain
-
-# Cache
-TENANT_CACHE_ENABLED=true
-TENANT_CACHE_TTL=3600
 ```
 
-## 🛠 Usage
+**For detailed installation instructions, see [docs/INSTALLATION.md](docs/INSTALLATION.md)**
 
-### Middleware Groups
+## Usage
 
-The package registers two middleware groups automatically:
+**Tenant Routes:**
 
-**For Tenant Routes** (requires tenant context):
 ```php
 Route::middleware('tenant')->group(function () {
-    Route::get('/dashboard', DashboardController::class);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 ```
 
-**For Central Routes** (no tenant allowed):
+**Central Routes:**
+
 ```php
 Route::middleware('central')->group(function () {
-    Route::get('/admin', AdminController::class);
+    Route::get('/admin', [AdminController::class, 'index']);
 });
 ```
 
-**Available Middleware Aliases:**
-- `tenant.identify` - Identifies the tenant from the request
-- `tenant.database` - Initializes the tenant database connection
-- `tenant.ensure` - Ensures a tenant exists (404 if not)
-- `tenant.central` - Ensures no tenant exists (403 if tenant present)
-
-### Helpers & Facade
-
-Access the current tenant anywhere in your application:
+**Helpers:**
 
 ```php
-use UendelSilveira\TenantCore\Facades\Tenant;
+$tenant = tenant_current();  // Get current tenant
+$id = tenant_key();          // Get tenant ID
+$slug = tenant_slug();       // Get tenant slug
 
-// Get current tenant
-$tenant = tenant_current();
-// or
-$tenant = Tenant::current();
-
-// Get tenant key
-$id = tenant_key();
-
-// Get tenant slug
-$slug = tenant_slug();
-
-// Check context
-if (is_tenant()) {
-    // In tenant context
-}
-
-if (is_central()) {
-    // In central context
-}
+is_tenant();   // Check if in tenant context
+is_central();  // Check if in central context
 ```
 
-### Tenant Model
+**Events:**
 
-Your Tenant model must implement the `TenantContract` interface:
+- `TenantResolved` - Tenant identified
+- `TenantBooted` - Database connected
+- `TenantEnded` - Context cleared
 
-```php
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use UendelSilveira\TenantCore\Contracts\TenantContract;
-
-class Tenant extends Model implements TenantContract
-{
-    protected $connection = 'central';
-
-    public function getTenantKey(): string|int
-    {
-        return $this->id;
-    }
-
-    public function getTenantSlug(): string
-    {
-        return $this->slug;
-    }
-
-    public function getTenantDatabase(): string
-    {
-        return $this->database_name;
-    }
-
-    public function getTenantDomain(): ?string
-    {
-        return $this->domain;
-    }
-}
-```
-
-### Events
-
-The package dispatches lifecycle events:
-
-- `TenantResolved` - When a tenant is identified
-- `TenantBooted` - When tenant database is connected
-- `TenantEnded` - When tenant context is cleared
-
-```php
-// EventServiceProvider
-protected $listen = [
-    \UendelSilveira\TenantCore\Events\TenantBooted::class => [
-        \App\Listeners\SetupTenantResources::class,
-    ],
-];
-```
-
-## 🏗 Architecture
-
-This package provides **infrastructure only**:
-
-| ✅ Included | ❌ Not Included |
-|-------------|-----------------|
-| Tenant resolution | Authentication |
-| Database switching | Authorization |
-| Context management | CRUD / Controllers |
-| Lifecycle events | UI / Views |
-| Caching | Billing / Plans |
-
-## 🧪 Testing
+## Testing
 
 ```bash
 composer test
 ```
 
-## 🤝 Contributing
+## License
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+The MIT License (MIT). See [LICENSE](LICENSE) for details.
 
-## 📄 License
+## Author
 
-The MIT License (MIT). See [LICENSE](LICENSE) for more information.
+**Uendel Silveira** - [uendelsilveira@gmail.com](mailto:uendelsilveira@gmail.com)
 
-## 👨‍💻 Author
-
-**Uendel Silveira**
-
-[![Email](https://img.shields.io/badge/Email-uendelsilveira%40gmail.com-blue)](mailto:uendelsilveira@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-uendelsilveira-blue)](https://linkedin.com/in/uendelsilveira)
-[![GitHub](https://img.shields.io/badge/GitHub-uendelsilveira-black)](https://github.com/uendelsilveira)
+[LinkedIn](https://linkedin.com/in/uendelsilveira) • [GitHub](https://github.com/uendelsilveira)

@@ -48,12 +48,29 @@ Isso criará o arquivo `config/tenant.php`.
 
 Você precisa de pelo menos duas conexões: uma para o banco **central** e outra para os bancos dos **tenants**.
 
+> 💡 **Dica:** As conexões reutilizam as variáveis padrão do Laravel (`DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`), apenas mudando o database.
+
 ```php
 // config/database.php
 
 'connections' => [
 
-    // Conexão central (onde ficam os dados dos tenants)
+    // Mantém a conexão mysql padrão do Laravel
+    'mysql' => [
+        'driver' => 'mysql',
+        'host' => env('DB_HOST', '127.0.0.1'),
+        'port' => env('DB_PORT', '3306'),
+        'database' => env('DB_DATABASE', 'laravel'),
+        'username' => env('DB_USERNAME', 'root'),
+        'password' => env('DB_PASSWORD', ''),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'strict' => true,
+        'engine' => null,
+    ],
+
+    // Conexão central (usa as mesmas credenciais, apenas muda o database)
     'central' => [
         'driver' => 'mysql',
         'host' => env('DB_HOST', '127.0.0.1'),
@@ -89,17 +106,27 @@ Você precisa de pelo menos duas conexões: uma para o banco **central** e outra
 ### 4. Adicionar variáveis de ambiente no `.env`
 
 ```env
-# Banco de dados central
+# Laravel Database (padrão - pode usar a mesma do central ou diferente)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Banco de dados central (usa as mesmas credenciais acima, apenas muda o nome)
 DB_DATABASE_CENTRAL=central
 
 # Configurações do Tenant Core
-TENANT_CENTRAL_DOMAIN=seudominio.com
+TENANT_CENTRAL_DOMAIN=localhost
 TENANT_CONNECTION_CENTRAL=central
 TENANT_CONNECTION_TENANT=tenant
 TENANT_RESOLVER=subdomain
 TENANT_CACHE_ENABLED=true
 TENANT_CACHE_TTL=3600
 ```
+
+> 💡 **Importante:** O `DB_DATABASE_CENTRAL` usa as mesmas credenciais (`DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`) da conexão padrão do Laravel.
 
 > 💡 **Dica:** Copie as variáveis do arquivo `.tenant-example.env` incluído no pacote.
 
