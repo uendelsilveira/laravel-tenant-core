@@ -6,7 +6,6 @@
 	 Created at: 05/01/26
 	*/
 	
-	
 	use UendelSilveira\TenantCore\Facades\Tenant;
 	
 	if (!function_exists('tenant_current')) {
