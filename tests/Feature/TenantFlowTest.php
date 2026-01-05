@@ -20,7 +20,7 @@ class TenantFlowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create tenants table
         Schema::connection('central')->create('tenants', function ($table) {
             $table->id();
@@ -28,13 +28,13 @@ class TenantFlowTest extends TestCase
             $table->string('domain');
             $table->string('database_name');
         });
-        
-        // Create test tenant
+
+        // Create test tenant with :memory: database for SQLite
         Tenant::on('central')->create([
             'id' => 1,
             'slug' => 'acme',
             'domain' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => ':memory:'
         ]);
     }
 
@@ -42,13 +42,13 @@ class TenantFlowTest extends TestCase
     public function it_completes_full_tenant_flow(): void
     {
         Event::fake();
-        
+
         // Setup route with middlewares
         Route::middleware([IdentifyTenant::class, InitializeTenantDatabase::class])
             ->get('/test', function () {
                 $context = app(TenantContextContract::class);
                 $tenant = $context->get();
-                
+
                 return response()->json([
                     'tenant_id' => $tenant?->getTenantKey(),
                     'tenant_slug' => $tenant?->getTenantSlug(),
@@ -70,7 +70,7 @@ class TenantFlowTest extends TestCase
         Event::assertDispatched(TenantResolved::class);
         Event::assertDispatched(TenantBooted::class);
         Event::assertDispatched(TenantEnded::class);
-        
+
         // After request, should be back to central
         $this->assertEquals('central', DB::getDefaultConnection());
     }
@@ -79,12 +79,12 @@ class TenantFlowTest extends TestCase
     public function it_stays_on_central_for_central_domain(): void
     {
         Event::fake();
-        
+
         // Setup route with middlewares
         Route::middleware([IdentifyTenant::class, InitializeTenantDatabase::class])
             ->get('/test', function () {
                 $context = app(TenantContextContract::class);
-                
+
                 return response()->json([
                     'is_central' => $context->isCentral(),
                     'connection' => DB::getDefaultConnection(),
