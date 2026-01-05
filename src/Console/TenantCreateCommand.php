@@ -40,11 +40,12 @@ class TenantCreateCommand extends Command
         $name = $this->argument('name');
         $slug = $this->option('slug') ?: Str::slug($name);
         $domain = $this->option('domain') ?: $slug;
-        $databaseName = 'tenant_' . $slug;
+        $databaseName = 'tenant_'.$slug;
 
         // Check if tenant already exists
         if ($tenantModel::on($connection)->where('slug', $slug)->exists()) {
             $this->error("Tenant with slug '{$slug}' already exists.");
+
             return self::FAILURE;
         }
 
@@ -96,7 +97,8 @@ class TenantCreateCommand extends Command
 
             return self::SUCCESS;
         } catch (\Exception $e) {
-            $this->error('Failed to create tenant: ' . $e->getMessage());
+            $this->error('Failed to create tenant: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }

@@ -34,6 +34,7 @@ class TenantMigrateRollbackCommand extends Command
 
         if ($tenants->isEmpty()) {
             $this->error('No tenants found.');
+
             return self::FAILURE;
         }
 

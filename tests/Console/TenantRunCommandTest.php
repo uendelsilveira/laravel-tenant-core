@@ -3,7 +3,6 @@
 namespace UendelSilveira\TenantCore\Tests\Console;
 
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
 use UendelSilveira\TenantCore\Tests\Fixtures\Domain;

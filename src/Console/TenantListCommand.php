@@ -38,6 +38,7 @@ class TenantListCommand extends Command
 
         if ($tenants->isEmpty()) {
             $this->warn('No tenants found.');
+
             return self::SUCCESS;
         }
 
@@ -46,7 +47,7 @@ class TenantListCommand extends Command
 
         foreach ($tenants as $tenant) {
             $domains = $tenant->domains->pluck('domain')->join(', ') ?: '-';
-            
+
             $rows[] = [
                 $tenant->getTenantKey(),
                 $tenant->name,

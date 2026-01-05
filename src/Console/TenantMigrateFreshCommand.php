@@ -32,6 +32,7 @@ class TenantMigrateFreshCommand extends Command
     {
         if (! $this->option('force') && ! $this->confirm('This will DROP ALL TABLES in tenant databases. Are you sure?')) {
             $this->info('Operation cancelled.');
+
             return self::SUCCESS;
         }
 
@@ -39,6 +40,7 @@ class TenantMigrateFreshCommand extends Command
 
         if ($tenants->isEmpty()) {
             $this->error('No tenants found.');
+
             return self::FAILURE;
         }
 

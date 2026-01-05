@@ -28,6 +28,7 @@ class TenantRunCommand extends Command
 
         if ($tenants->isEmpty()) {
             $this->error('No tenants found.');
+
             return 1;
         }
 
@@ -61,11 +62,11 @@ class TenantRunCommand extends Command
 
                 // Show command output if any
                 $output = Artisan::output();
-                if (!empty(trim($output))) {
+                if (! empty(trim($output))) {
                     $this->line($output);
                 }
             } catch (\Exception $e) {
-                $this->error("✗ Error for {$tenant->slug}: " . $e->getMessage());
+                $this->error("✗ Error for {$tenant->slug}: ".$e->getMessage());
                 $errorCount++;
             }
 
@@ -73,7 +74,7 @@ class TenantRunCommand extends Command
         }
 
         // Summary
-        $this->info("Summary:");
+        $this->info('Summary:');
         $this->line("✓ Success: {$successCount}");
         if ($errorCount > 0) {
             $this->line("✗ Errors: {$errorCount}");
