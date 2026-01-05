@@ -142,12 +142,25 @@ return [
 
 ---
 
-## Criando o Model Tenant
+## Criando os Models
 
-### 6. Criar o Model `Tenant`
+### 6. Publicar os models (recomendado)
+
+```bash
+php artisan vendor:publish --tag=tenant-model
+```
+
+Isso criará:
+- `app/Models/Tenant.php`
+- `app/Models/Domain.php`
+- `app/Models/SystemUser.php`
+
+**Ou criar manualmente:**
 
 ```bash
 php artisan make:model Tenant
+php artisan make:model Domain
+php artisan make:model SystemUser
 ```
 
 ### 7. Implementar o contrato `TenantContract`
@@ -194,7 +207,56 @@ class Tenant extends Model implements TenantContract
 }
 ```
 
-### 8. (Opcional) Credenciais de banco por tenant
+### 8. Configurar o Model User (Central Database)
+
+> ⚠️ **Importante:** O modelo `User.php` NÃO é publicado automaticamente para evitar conflitos com o User padrão do Laravel.
+
+Adicione a seguinte linha ao seu `app/Models/User.php` **existente**:
+
+```php
+protected $connection = 'central';
+```
+
+**Exemplo completo:**
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use Notifiable;
+
+    protected $connection = 'central'; // ← Adicionar esta linha
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+}
+```
+
+Isso garante que os usuários administrativos do sistema (SuperAdmin) sejam armazenados no banco de dados central.
+
+### 9. (Opcional) Credenciais de banco por tenant
 
 Se cada tenant tiver credenciais próprias de banco de dados:
 

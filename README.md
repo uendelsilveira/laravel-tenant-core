@@ -18,7 +18,6 @@ This package provides the essential infrastructure to build multi-tenant applica
 ## 📖 Documentation
 
 - **[Installation Guide](docs/INSTALLATION.md)** - Complete step-by-step installation tutorial
-- **[Architecture Boundaries](docs/architecture-boundaries.md)** - What this package does and doesn't do
 - **[Environment Variables](.tenant-example.env)** - All available configuration options
 
 ## 📦 Quick Installation
@@ -29,9 +28,57 @@ Requires PHP 8.2+ and Laravel 10.x, 11.x or 12.x.
 composer require uendelsilveira/laravel-tenant-core
 ```
 
+**Publish configuration:**
 ```bash
 php artisan vendor:publish --tag=tenant-config
 ```
+
+**Publish migrations (optional but recommended):**
+```bash
+php artisan vendor:publish --tag=tenant-migrations
+```
+
+**Publish models (optional but recommended):**
+```bash
+php artisan vendor:publish --tag=tenant-model
+```
+This publishes: `Tenant.php`, `Domain.php`, `SystemUser.php`
+
+> ⚠️ **Note:** The `User` model is NOT published to avoid conflicts with Laravel's default User model. See installation docs for how to configure your existing User model for the central database.
+
+**Publish route files (optional but recommended):**
+```bash
+php artisan vendor:publish --tag=tenant-routes
+```
+
+**Publish seeders (optional - includes example tenant and SuperAdmin):**
+```bash
+php artisan vendor:publish --tag=tenant-seeders
+```
+
+**Or publish everything at once:**
+```bash
+php artisan vendor:publish --provider="UendelSilveira\TenantCore\Providers\TenantServiceProvider"
+```
+
+**Quick Start (with example data):**
+```bash
+# Run central migrations
+php artisan migrate --database=central --path=database/migrations/central
+
+# Seed example tenant and SuperAdmin
+php artisan db:seed --database=central
+
+# Create tenant database
+mysql -e "CREATE DATABASE tenant_foo;"
+
+# Run tenant migrations
+php artisan migrate --database=tenant --path=database/migrations/tenant
+```
+
+Example credentials after seeding:
+- **SuperAdmin (Central)**: mail@example.com / 123456
+- **Example Tenant**: foo.localhost (database: tenant_foo)
 
 > 📘 For a complete installation guide with database setup, model creation, and route configuration, see **[docs/INSTALLATION.md](docs/INSTALLATION.md)**.
 
@@ -173,8 +220,6 @@ This package provides **infrastructure only**:
 | Context management | CRUD / Controllers |
 | Lifecycle events | UI / Views |
 | Caching | Billing / Plans |
-
-See [docs/architecture-boundaries.md](docs/architecture-boundaries.md) for details.
 
 ## 🧪 Testing
 
