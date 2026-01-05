@@ -1,5 +1,12 @@
 <?php
 
+/*
+ By Uendel Silveira
+ Developer Web
+ IDE: PhpStorm
+ Created: 05/01/2026
+*/
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
