@@ -1,0 +1,51 @@
+packages/
+└── laravel-tenant-core/
+├── src/
+│   ├── Contracts/
+│   │   ├── TenantContract.php
+│   │   ├── TenantContextContract.php
+│   │   └── TenantDatabaseManagerContract.php
+│   │
+│   ├── Context/
+│   │   └── TenantContext.php
+│   │
+│   ├── Database/
+│   │   └── TenantDatabaseManager.php
+│   │
+│   ├── Facades/
+│   │   └── Tenant.php
+│   │
+│   ├── Middleware/
+│   │   ├── IdentifyTenant.php
+│   │   ├── InitializeTenantDatabase.php
+│   │   ├── EnsureCentral.php
+│   │   └── EnsureTenant.php
+│   │
+│   ├── Events/
+│   │   ├── TenantResolved.php
+│   │   ├── TenantBooted.php
+│   │   └── TenantEnded.php
+│   │
+│   ├── Commands/
+│   │   ├── TenantCreateCommand.php
+│   │   ├── TenantListCommand.php
+│   │   └── TenantMigrateCommand.php
+│   │
+│   ├── Helpers/
+│   │   └── helpers.php
+│   │
+│   └── TenantServiceProvider.php
+│
+├── config/
+│   └── tenant.php
+│
+├── database/
+│   └── migrations/
+│       └── central/
+│           └── 2026_01_01_000000_create_tenants_table.php
+│
+├── docs/
+│   └── architecture-boundaries.md
+│
+├── composer.json
+└── README.md
