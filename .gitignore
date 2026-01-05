@@ -1,0 +1,31 @@
+# Composer (biblioteca)
+vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+coverage/
+.clover
+
+# Ferramentas PHP
+.php-cs-fixer.cache
+.phpstorm.meta.php
+
+# IDEs/editores
+.idea/
+.vscode/
+*.code-workspace
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente locais (se usar para dev)
+.env
+.env.*.local
+.env.local
+
+# Benchmarks/cache genéricos
+.benchmarks/
+.cache/
