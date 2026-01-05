@@ -33,6 +33,9 @@ abstract class TestCase extends Orchestra
         $app['config']->set('tenant.connections.central', 'central');
         $app['config']->set('tenant.connections.tenant', 'tenant');
         $app['config']->set('tenant.resolver.type', 'subdomain');
+
+        // Disable cache for tests
+        $app['config']->set('tenant.cache.enabled', false);
     }
 }
 

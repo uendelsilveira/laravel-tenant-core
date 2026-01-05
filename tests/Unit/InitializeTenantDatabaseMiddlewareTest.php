@@ -19,11 +19,11 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
     public function it_connects_to_tenant_database_when_tenant_is_set(): void
     {
         Event::fake();
-        
+
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'acme',
-            'database_name' => 'tenant_acme'
+            'database_name' => ':memory:'
         ]);
 
         $context = app(TenantContextContract::class);
@@ -42,7 +42,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
 
         // After request, should be disconnected
         $this->assertEquals('central', DB::getDefaultConnection());
-        
+
         Event::assertDispatched(TenantBooted::class);
         Event::assertDispatched(TenantEnded::class);
     }
@@ -51,7 +51,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
     public function it_does_not_connect_when_no_tenant_is_set(): void
     {
         Event::fake();
-        
+
         $context = app(TenantContextContract::class);
         $dbManager = app(TenantDatabaseManagerContract::class);
         $middleware = new InitializeTenantDatabase($context, $dbManager);
@@ -65,7 +65,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         });
 
         $this->assertEquals('central', DB::getDefaultConnection());
-        
+
         Event::assertNotDispatched(TenantBooted::class);
         Event::assertNotDispatched(TenantEnded::class);
     }

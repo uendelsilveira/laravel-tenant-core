@@ -24,12 +24,12 @@ class TenantDatabaseManagerTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'test-tenant',
-            'database_name' => 'tenant_test_db'
+            'database_name' => ':memory:'
         ]);
 
         $this->manager->connect($tenant);
 
-        $this->assertEquals('tenant_test_db', Config::get('database.connections.tenant.database'));
+        $this->assertEquals(':memory:', Config::get('database.connections.tenant.database'));
         $this->assertEquals('tenant', DB::getDefaultConnection());
     }
 
@@ -39,7 +39,7 @@ class TenantDatabaseManagerTest extends TestCase
         $tenant = new Tenant([
             'id' => 1,
             'slug' => 'test-tenant',
-            'database_name' => 'tenant_test_db'
+            'database_name' => ':memory:'
         ]);
 
         // First connect
@@ -49,6 +49,20 @@ class TenantDatabaseManagerTest extends TestCase
         // Then disconnect
         $this->manager->disconnect();
         $this->assertEquals('central', DB::getDefaultConnection());
+    }
+
+    /** @test */
+    public function it_throws_exception_for_empty_database(): void
+    {
+        $this->expectException(\UendelSilveira\TenantCore\Exceptions\TenantDatabaseException::class);
+
+        $tenant = new Tenant([
+            'id' => 1,
+            'slug' => 'test-tenant',
+            'database_name' => ''
+        ]);
+
+        $this->manager->connect($tenant);
     }
 }
 
