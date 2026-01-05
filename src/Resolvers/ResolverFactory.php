@@ -8,28 +8,45 @@
 
 namespace UendelSilveira\TenantCore\Resolvers;
 
-use InvalidArgumentException;
 use UendelSilveira\TenantCore\Contracts\TenantResolverContract;
+use UendelSilveira\TenantCore\Exceptions\InvalidResolverException;
 
 class ResolverFactory
 {
     /**
      * Create a resolver instance based on configuration.
      *
-     * @param string|null $type
-     * @return TenantResolverContract
-     * @throws InvalidArgumentException
+     * @throws InvalidResolverException
      */
     public static function make(?string $type = null): TenantResolverContract
     {
         $type = $type ?? config('tenant.resolver.type', 'subdomain');
-        
-        return match ($type) {
-            'subdomain' => new SubdomainResolver(),
-            'path' => new PathResolver(),
-            'header' => new HeaderResolver(),
-            default => throw new InvalidArgumentException("Unsupported resolver type: {$type}"),
-        };
+
+        $drivers = config('tenant.resolver.drivers', [
+            'subdomain' => SubdomainResolver::class,
+            'path' => PathResolver::class,
+            'header' => HeaderResolver::class,
+        ]);
+
+        if (!isset($drivers[$type])) {
+            throw new InvalidResolverException($type);
+        }
+
+        $resolverClass = $drivers[$type];
+
+        if (!class_exists($resolverClass)) {
+            throw new InvalidResolverException($type);
+        }
+
+        $resolver = app($resolverClass);
+
+        if (!$resolver instanceof TenantResolverContract) {
+            throw new InvalidResolverException(
+                "{$resolverClass} must implement TenantResolverContract"
+            );
+        }
+
+        return $resolver;
     }
 }
 
