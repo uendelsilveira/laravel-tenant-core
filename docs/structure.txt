@@ -34,7 +34,8 @@ packages/
 │   ├── Helpers/
 │   │   └── helpers.php
 │   │
-│   └── TenantServiceProvider.php
+│   └── Providers/
+│       └── TenantServiceProvider.php
 │
 ├── config/
 │   └── tenant.php
