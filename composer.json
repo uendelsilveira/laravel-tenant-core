@@ -3,40 +3,73 @@
   "description": "Infrastructure-only multi-tenant multi-database package for Laravel",
   "type": "library",
   "license": "MIT",
-  "authors": [
-	{
-	  "name": "Uendel Silveira",
-	  "email": "uendelsilveira@gmail.com"
-	}
+  "keywords": [
+    "laravel",
+    "multi-tenant",
+    "multi-tenancy",
+    "multi-database",
+    "saas",
+    "tenant"
   ],
+  "authors": [
+    {
+      "name": "Uendel Silveira",
+      "email": "uendelsilveira@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/uendelsilveira/laravel-tenant-core",
+  "support": {
+    "issues": "https://github.com/uendelsilveira/laravel-tenant-core/issues",
+    "source": "https://github.com/uendelsilveira/laravel-tenant-core"
+  },
   "require": {
-	"php": "^8.2|^8.3|^8.4",
-	"illuminate/support": "^10.0|^11.0"
+    "php": "^8.2",
+    "illuminate/support": "^10.0|^11.0|^12.0",
+    "illuminate/database": "^10.0|^11.0|^12.0",
+    "illuminate/http": "^10.0|^11.0|^12.0",
+    "illuminate/routing": "^10.0|^11.0|^12.0",
+    "illuminate/cache": "^10.0|^11.0|^12.0"
   },
   "require-dev": {
-	"phpunit/phpunit": "^10.0|^11.0",
-	"orchestra/testbench": "^8.0|^9.0",
-	"mockery/mockery": "^1.6"
+    "phpunit/phpunit": "^10.0|^11.0",
+    "orchestra/testbench": "^8.0|^9.0|^10.0",
+    "mockery/mockery": "^1.6",
+    "laravel/pint": "^1.0"
   },
   "autoload": {
-	"psr-4": {
-	  "UendelSilveira\\TenantCore\\": "src/"
-	},
-	"files": [
-	  "src/Helpers/helpers.php"
-	]
+    "psr-4": {
+      "UendelSilveira\\TenantCore\\": "src/"
+    },
+    "files": [
+      "src/Helpers/helpers.php"
+    ]
   },
   "autoload-dev": {
-	"psr-4": {
-	  "UendelSilveira\\TenantCore\\Tests\\": "tests/"
-	}
+    "psr-4": {
+      "UendelSilveira\\TenantCore\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit",
+    "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
+    "format": "vendor/bin/pint",
+    "check-style": "vendor/bin/pint --test"
   },
   "extra": {
-	"laravel": {
-	  "providers": [
-		"UendelSilveira\\TenantCore\\Providers\\TenantServiceProvider"
-	  ]
-	}
+    "laravel": {
+      "providers": [
+        "UendelSilveira\\TenantCore\\Providers\\TenantServiceProvider"
+      ],
+      "aliases": {
+        "Tenant": "UendelSilveira\\TenantCore\\Facades\\Tenant"
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
   },
   "minimum-stability": "stable",
   "prefer-stable": true
