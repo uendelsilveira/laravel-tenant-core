@@ -6,6 +6,10 @@
 	 Created at: 05/01/26
 	*/
 	
+	namespace UendelSilveira\TenantCore\Database;
+
+	use Illuminate\Support\Facades\Config;
+	use Illuminate\Support\Facades\DB;
 	use UendelSilveira\TenantCore\Contracts\TenantContract;
 	use UendelSilveira\TenantCore\Contracts\TenantDatabaseManagerContract;
 	
@@ -13,9 +17,7 @@
 	{
 		public function connect(TenantContract $tenant): void
 		{
-			config([
-				'database.connections.tenant.database' => $tenant->getTenantDatabase(),
-			]);
+			Config::set('database.connections.tenant.database', $tenant->getTenantDatabase());
 			
 			DB::purge('tenant');
 			DB::reconnect('tenant');

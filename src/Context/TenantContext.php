@@ -6,6 +6,8 @@
 	 Created at: 05/01/26
 	*/
 	
+	namespace UendelSilveira\TenantCore\Context;
+
 	use UendelSilveira\TenantCore\Contracts\TenantContextContract;
 	use UendelSilveira\TenantCore\Contracts\TenantContract;
 	
