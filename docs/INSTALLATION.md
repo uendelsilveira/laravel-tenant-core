@@ -44,7 +44,28 @@ Isso criará o arquivo `config/tenant.php`.
 
 ## Configuração do Banco de Dados
 
-### 3. Configurar as conexões no `config/database.php`
+### 3. Mover migrations padrão do Laravel para central
+
+> ⚠️ **Importante:** As migrations padrão do Laravel (`users`, `password_resets`, `failed_jobs`) devem ser movidas para o banco central.
+
+```bash
+# Criar diretório para migrations centrais (se não existir)
+mkdir -p database/migrations/central
+
+# Mover migrations padrão do Laravel para central
+mv database/migrations/*_create_users_table.php database/migrations/central/
+mv database/migrations/*_create_password_reset_tokens_table.php database/migrations/central/
+mv database/migrations/*_create_sessions_table.php database/migrations/central/
+mv database/migrations/*_create_cache_table.php database/migrations/central/
+mv database/migrations/*_create_jobs_table.php database/migrations/central/
+```
+
+**Por que fazer isso?**
+- O model `User` usa `protected $connection = 'central';`
+- As migrations devem estar no mesmo banco que o model
+- Evita erros de "table not found" ao fazer autenticação
+
+### 4. Configurar as conexões no `config/database.php`
 
 Você precisa de pelo menos duas conexões: uma para o banco **central** e outra para os bancos dos **tenants**.
 
@@ -536,6 +557,52 @@ Tenant::create([
 CREATE DATABASE tenant_teste;
 ```
 
+### 15.1. Rodar migrations do tenant
+
+```bash
+php artisan migrate --database=tenant --path=database/migrations/tenant
+```
+
+Isso criará as tabelas padrão do Laravel no banco do tenant:
+- `users` - Usuários do tenant (SystemUser)
+- `password_reset_tokens` - Tokens de redefinição de senha
+- `sessions` - Sessões de usuários
+- `cache` e `cache_locks` - Cache do Laravel
+- `jobs`, `job_batches`, `failed_jobs` - Filas de trabalho
+
+### 15.2. (Opcional) Criar usuário admin do tenant
+
+Você pode usar o seeder publicado ou criar manualmente:
+
+**Usando Seeder:**
+
+```bash
+# Conectar ao banco do tenant e criar admin
+php artisan db:seed --class=SystemUserSeeder --database=tenant
+```
+
+**Ou manualmente via Tinker:**
+
+```bash
+php artisan tinker
+```
+
+```php
+use App\Models\SystemUser;
+use Illuminate\Support\Facades\Hash;
+
+// Conectar ao tenant
+config(['database.connections.tenant.database' => 'tenant_teste']);
+
+SystemUser::on('tenant')->create([
+    'name' => 'Tenant Admin',
+    'email' => 'admin@tenant.local',
+    'password' => Hash::make('password'),
+]);
+```
+
+> 💡 **Dica:** Você pode criar um comando `tenant:seed` para seed em todos os tenants automaticamente.
+
 ### 16. Configurar hosts locais (desenvolvimento)
 
 Adicione ao arquivo `/etc/hosts` (Linux/Mac) ou `C:\Windows\System32\drivers\etc\hosts` (Windows):
@@ -574,6 +641,153 @@ Route::get('/debug', function () {
 
 ---
 
+## Comandos Artisan
+
+O pacote inclui comandos poderosos para gerenciamento de tenants:
+
+### `tenant:list` - Listar Tenants
+
+Lista todos os tenants cadastrados:
+
+```bash
+php artisan tenant:list
+php artisan tenant:list --active  # Apenas ativos
+```
+
+**Saída:**
+```
++----+-------------+-----------+-----------------+-------------------+--------+
+| ID | Name        | Slug      | Domains         | Database          | Active |
++----+-------------+-----------+-----------------+-------------------+--------+
+| 1  | Acme Corp   | acme-corp | acme, acme.com  | tenant_acme-corp  | ✓      |
+| 2  | Tech Inc    | tech-inc  | tech            | tenant_tech-inc   | ✓      |
++----+-------------+-----------+-----------------+-------------------+--------+
+```
+
+### `tenant:create` - Criar Tenant
+
+Cria um novo tenant com opções para configuração automática:
+
+```bash
+php artisan tenant:create "Acme Corp"
+php artisan tenant:create "Acme Corp" --slug=acme --domain=acme
+php artisan tenant:create "Acme Corp" --create-db --migrate --seed
+```
+
+**Opções:**
+- `--slug=` - Define o slug (auto-gerado se omitido)
+- `--domain=` - Define o domínio (usa slug se omitido)
+- `--create-db` - Cria o banco de dados automaticamente
+- `--migrate` - Roda as migrations do tenant
+- `--seed` - Seed os dados iniciais
+
+**Exemplo completo:**
+```bash
+php artisan tenant:create "Acme Corp" --create-db --migrate --seed
+```
+
+Saída:
+```
+Creating tenant: Acme Corp
+Slug: acme-corp
+Domain: acme-corp
+Database: tenant_acme-corp
+
+Creating database...
+✓ Database created: tenant_acme-corp
+✓ Tenant created with ID: 1
+✓ Domain created: acme-corp
+
+Migrating tenant: acme-corp (Database: tenant_acme-corp)
+Migrating: 2024_01_01_000000_create_users_table
+...
+✓ Completed: acme-corp
+
+Tenant created successfully!
+```
+
+### `tenant:migrate` - Rodar Migrations
+
+Roda migrations nos bancos dos tenants:
+
+```bash
+php artisan tenant:migrate                  # Todos os tenants
+php artisan tenant:migrate --tenant=acme    # Tenant específico
+php artisan tenant:migrate --seed           # Com seeding
+```
+
+### `tenant:migrate:fresh` - Fresh Migrations
+
+Dropa todas as tabelas e re-roda as migrations:
+
+```bash
+php artisan tenant:migrate:fresh --tenant=acme
+php artisan tenant:migrate:fresh --seed --force
+```
+
+⚠️ **Atenção:** Este comando apaga todos os dados! Pede confirmação antes de executar.
+
+### `tenant:migrate:rollback` - Rollback Migrations
+
+Reverte migrations:
+
+```bash
+php artisan tenant:migrate:rollback
+php artisan tenant:migrate:rollback --step=2
+php artisan tenant:migrate:rollback --tenant=acme
+```
+
+### `tenant:seed` - Seed Database
+
+Popula o banco de dados com dados iniciais:
+
+```bash
+php artisan tenant:seed
+php artisan tenant:seed --class=SystemUserSeeder
+php artisan tenant:seed --tenant=acme
+```
+
+### `tenant:run` - Rodar Comando Artisan
+
+Executa qualquer comando Artisan no contexto de um ou todos os tenants:
+
+```bash
+php artisan tenant:run list                 # Roda 'list' para todos
+php artisan tenant:run list --tenant=acme   # Tenant específico
+php artisan tenant:run cache:clear          # Limpa cache de todos
+php artisan tenant:run queue:work           # Inicia worker para todos
+```
+
+**Casos de uso:**
+```bash
+# Limpar cache de todos os tenants
+php artisan tenant:run cache:clear
+
+# Rodar comando customizado
+php artisan tenant:run app:custom-command --tenant=acme
+
+# Ver rotas de um tenant específico
+php artisan tenant:run route:list --tenant=acme
+```
+
+**Saída:**
+```
+Running command: cache:clear
+
+Running for tenant: Acme Corp (acme-corp)
+Application cache cleared successfully.
+✓ Completed: acme-corp
+
+Running for tenant: Tech Inc (tech-inc)
+Application cache cleared successfully.
+✓ Completed: tech-inc
+
+Summary:
+✓ Success: 2
+```
+
+---
+
 ## Próximos Passos
 
 Após a instalação básica, você pode:
@@ -594,47 +808,6 @@ protected $listen = [
         \App\Listeners\CleanupTenantResources::class,
     ],
 ];
-```
-
-### Migrations por Tenant
-
-Crie um comando para rodar migrations em todos os tenants:
-
-```php
-// app/Console/Commands/TenantMigrate.php
-
-namespace App\Console\Commands;
-
-use App\Models\Tenant;
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-
-class TenantMigrate extends Command
-{
-    protected $signature = 'tenant:migrate {--tenant=}';
-    protected $description = 'Run migrations for tenants';
-
-    public function handle(): void
-    {
-        $tenants = $this->option('tenant')
-            ? Tenant::where('slug', $this->option('tenant'))->get()
-            : Tenant::where('is_active', true)->get();
-
-        foreach ($tenants as $tenant) {
-            $this->info("Migrating tenant: {$tenant->slug}");
-
-            config(['database.connections.tenant.database' => $tenant->database_name]);
-
-            Artisan::call('migrate', [
-                '--database' => 'tenant',
-                '--path' => 'database/migrations/tenant',
-                '--force' => true,
-            ]);
-
-            $this->info(Artisan::output());
-        }
-    }
-}
 ```
 
 ### Usar diferentes Resolvers

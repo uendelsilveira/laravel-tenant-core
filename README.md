@@ -47,7 +47,25 @@ TENANT_CONNECTION_TENANT=tenant
 TENANT_RESOLVER=subdomain
 ```
 
+> ⚠️ **Important:** Move Laravel's default migrations to `database/migrations/central/` as they use the central database. See [Installation Guide](docs/INSTALLATION.md) for details.
+
 **For detailed installation instructions, see [docs/INSTALLATION.md](docs/INSTALLATION.md)**
+
+## Artisan Commands
+
+The package includes powerful commands to manage tenants:
+
+```bash
+php artisan tenant:list              # List all tenants
+php artisan tenant:create "Company"  # Create new tenant
+php artisan tenant:migrate           # Run migrations for all tenants
+php artisan tenant:migrate:fresh     # Fresh migrations
+php artisan tenant:migrate:rollback  # Rollback migrations
+php artisan tenant:seed              # Seed tenant databases
+php artisan tenant:run {command}     # Run any Artisan command for tenants
+```
+
+See [Installation Guide](docs/INSTALLATION.md) for detailed command usage.
 
 ## Usage
 
