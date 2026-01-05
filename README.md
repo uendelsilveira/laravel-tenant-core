@@ -15,25 +15,27 @@ This package provides the essential infrastructure to build multi-tenant applica
 - **Laravel Octane Support**: Automatic context cleanup between requests.
 - **Agnostic**: No built-in authentication, UI, or business logic. You build your app your way.
 
-## 📦 Installation
+## 📖 Documentation
 
-Requires PHP 8.2+ and Laravel 10.0+ or 11.0+.
+- **[Installation Guide](docs/INSTALLATION.md)** - Complete step-by-step installation tutorial
+- **[Architecture Boundaries](docs/architecture-boundaries.md)** - What this package does and doesn't do
+- **[Environment Variables](.tenant-example.env)** - All available configuration options
+
+## 📦 Quick Installation
+
+Requires PHP 8.2+ and Laravel 10.x, 11.x or 12.x.
 
 ```bash
 composer require uendelsilveira/laravel-tenant-core
 ```
 
-## ⚙️ Configuration
-
-Publish the configuration file:
-
 ```bash
 php artisan vendor:publish --tag=tenant-config
 ```
 
-This will create a `config/tenant.php` file.
+> 📘 For a complete installation guide with database setup, model creation, and route configuration, see **[docs/INSTALLATION.md](docs/INSTALLATION.md)**.
 
-### Environment Variables
+## ⚙️ Configuration
 
 Copy the variables from [.tenant-example.env](.tenant-example.env) to your `.env` file:
 
@@ -47,16 +49,11 @@ TENANT_CONNECTION_TENANT=tenant
 
 # Resolver (subdomain, path, header)
 TENANT_RESOLVER=subdomain
-TENANT_HEADER_NAME=X-Tenant-ID
-TENANT_HEADER_SLUG_NAME=X-Tenant-Slug
 
 # Cache
 TENANT_CACHE_ENABLED=true
 TENANT_CACHE_TTL=3600
-TENANT_CACHE_STORE=
 ```
-
-Ensure you have configured your database connections in `config/database.php`.
 
 ## 🛠 Usage
 
@@ -102,12 +99,11 @@ $id = tenant_key();
 // Get tenant slug
 $slug = tenant_slug();
 
-// Check if context is tenant
+// Check context
 if (is_tenant()) {
     // In tenant context
 }
 
-// Check if context is central
 if (is_central()) {
     // In central context
 }
@@ -125,6 +121,8 @@ use UendelSilveira\TenantCore\Contracts\TenantContract;
 
 class Tenant extends Model implements TenantContract
 {
+    protected $connection = 'central';
+
     public function getTenantKey(): string|int
     {
         return $this->id;
@@ -147,84 +145,55 @@ class Tenant extends Model implements TenantContract
 }
 ```
 
-**Optional: Custom Database Credentials**
-
-If each tenant has its own database credentials, implement `TenantDatabaseCredentialsContract`:
-
-```php
-use UendelSilveira\TenantCore\Contracts\TenantDatabaseCredentialsContract;
-
-class Tenant extends Model implements TenantContract, TenantDatabaseCredentialsContract
-{
-    // ... TenantContract methods ...
-
-    public function getTenantDatabaseHost(): ?string
-    {
-        return $this->database_host;
-    }
-
-    public function getTenantDatabasePort(): ?int
-    {
-        return $this->database_port;
-    }
-
-    public function getTenantDatabaseUsername(): ?string
-    {
-        return $this->database_username;
-    }
-
-    public function getTenantDatabasePassword(): ?string
-    {
-        return $this->database_password;
-    }
-}
-```
-
 ### Events
 
-The package dispatches the following events during the tenant lifecycle:
+The package dispatches lifecycle events:
 
-- `TenantResolved` - When a tenant is identified from the request
-- `TenantBooted` - When the tenant database connection is established
-- `TenantEnded` - When the request completes and tenant context is cleared
+- `TenantResolved` - When a tenant is identified
+- `TenantBooted` - When tenant database is connected
+- `TenantEnded` - When tenant context is cleared
 
 ```php
-// In your EventServiceProvider
+// EventServiceProvider
 protected $listen = [
-    \UendelSilveira\TenantCore\Events\TenantResolved::class => [
-        \App\Listeners\LogTenantAccess::class,
-    ],
     \UendelSilveira\TenantCore\Events\TenantBooted::class => [
         \App\Listeners\SetupTenantResources::class,
     ],
 ];
 ```
 
-## 🏗 Architecture & Boundaries
+## 🏗 Architecture
 
-This package strictly follows the principle that **infrastructure should not contain application rules**.
+This package provides **infrastructure only**:
 
-**What is included:**
-- Tenant resolution (subdomain, path, header)
-- Database connection switching
-- Execution context management
-- Lifecycle events
+| ✅ Included | ❌ Not Included |
+|-------------|-----------------|
+| Tenant resolution | Authentication |
+| Database switching | Authorization |
+| Context management | CRUD / Controllers |
+| Lifecycle events | UI / Views |
+| Caching | Billing / Plans |
 
-**What is NOT included:**
-- Authentication / Authorization
-- CRUD / Controllers
-- UI / Views
-- Billing / Plans
+See [docs/architecture-boundaries.md](docs/architecture-boundaries.md) for details.
 
-For a detailed explanation of the architectural boundaries, please refer to [docs/architecture-boundaries.md](docs/architecture-boundaries.md).
+## 🧪 Testing
+
+```bash
+composer test
+```
+
+## 🤝 Contributing
+
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## 📄 License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+The MIT License (MIT). See [LICENSE](LICENSE) for more information.
 
-## 👨‍💻 Autor
+## 👨‍💻 Author
 
 **Uendel Silveira**
-* 📧 [uendel.silveira@gmail.com](mailto:uendel.silveira@gmail.com)
-* 🔗 [LinkedIn](https://linkedin.com/in/uendelsilveira)
-* 🐙 [GitHub](https://github.com/uendelsilveira)
+
+[![Email](https://img.shields.io/badge/Email-uendelsilveira%40gmail.com-blue)](mailto:uendelsilveira@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-uendelsilveira-blue)](https://linkedin.com/in/uendelsilveira)
+[![GitHub](https://img.shields.io/badge/GitHub-uendelsilveira-black)](https://github.com/uendelsilveira)
