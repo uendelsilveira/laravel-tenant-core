@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
@@ -18,7 +20,7 @@ use UendelSilveira\TenantCore\Tests\TestCase;
 
 class EnsureCentralMiddlewareTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_allows_request_when_no_tenant_is_set(): void
     {
         $context = app(TenantContextContract::class);
@@ -32,7 +34,7 @@ class EnsureCentralMiddlewareTest extends TestCase
         $this->assertEquals('OK', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_tenant_is_set(): void
     {
         $this->expectException(AccessDeniedHttpException::class);

@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use UendelSilveira\TenantCore\Database\TenantDatabaseManager;
@@ -25,7 +27,7 @@ class TenantDatabaseManagerTest extends TestCase
         $this->manager = new TenantDatabaseManager();
     }
 
-    /** @test */
+    #[Test]
     public function it_can_connect_to_tenant_database(): void
     {
         $tenant = new Tenant([
@@ -40,7 +42,7 @@ class TenantDatabaseManagerTest extends TestCase
         $this->assertEquals('tenant', DB::getDefaultConnection());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_disconnect_from_tenant_database(): void
     {
         $tenant = new Tenant([
@@ -58,7 +60,7 @@ class TenantDatabaseManagerTest extends TestCase
         $this->assertEquals('central', DB::getDefaultConnection());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_for_empty_database(): void
     {
         $this->expectException(\UendelSilveira\TenantCore\Exceptions\TenantDatabaseException::class);

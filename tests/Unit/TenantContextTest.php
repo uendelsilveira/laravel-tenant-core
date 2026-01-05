@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use UendelSilveira\TenantCore\Context\TenantContext;
 use UendelSilveira\TenantCore\Tests\Fixtures\Tenant;
 use UendelSilveira\TenantCore\Tests\TestCase;
@@ -23,14 +25,14 @@ class TenantContextTest extends TestCase
         $this->context = new TenantContext();
     }
 
-    /** @test */
+    #[Test]
     public function it_starts_with_no_tenant(): void
     {
         $this->assertNull($this->context->get());
         $this->assertTrue($this->context->isCentral());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_a_tenant(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);
@@ -41,7 +43,7 @@ class TenantContextTest extends TestCase
         $this->assertFalse($this->context->isCentral());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_clear_tenant(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);
@@ -55,7 +57,7 @@ class TenantContextTest extends TestCase
         $this->assertTrue($this->context->isCentral());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_tenant_to_null(): void
     {
         $tenant = new Tenant(['id' => 1, 'slug' => 'test', 'database_name' => 'test_db']);

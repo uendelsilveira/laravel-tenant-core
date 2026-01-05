@@ -10,6 +10,7 @@
 namespace UendelSilveira\TenantCore\Tests\Fixtures;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use UendelSilveira\TenantCore\Contracts\TenantContract;
 
 class Tenant extends Model implements TenantContract
@@ -35,6 +36,21 @@ class Tenant extends Model implements TenantContract
 
     public function getTenantDomain(): ?string
     {
-        return $this->domain;
+        // For backward compatibility with tests that use 'domain' field
+        if (isset($this->attributes['domain'])) {
+            return $this->domain;
+        }
+
+        // New structure: get from domains relationship
+        return $this->domains()->where('is_primary', true)->first()?->domain
+            ?? $this->domains()->first()?->domain;
+    }
+
+    /**
+     * Get the domains for the tenant.
+     */
+    public function domains(): HasMany
+    {
+        return $this->hasMany(Domain::class);
     }
 }

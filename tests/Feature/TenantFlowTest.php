@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Feature;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +21,7 @@ use UendelSilveira\TenantCore\Events\TenantEnded;
 use UendelSilveira\TenantCore\Events\TenantResolved;
 use UendelSilveira\TenantCore\Middleware\IdentifyTenant;
 use UendelSilveira\TenantCore\Middleware\InitializeTenantDatabase;
+use UendelSilveira\TenantCore\Tests\Fixtures\Domain;
 use UendelSilveira\TenantCore\Tests\Fixtures\Tenant;
 use UendelSilveira\TenantCore\Tests\TestCase;
 
@@ -32,20 +35,33 @@ class TenantFlowTest extends TestCase
         Schema::connection('central')->create('tenants', function ($table) {
             $table->id();
             $table->string('slug');
-            $table->string('domain');
             $table->string('database_name');
         });
 
+        // Create domains table
+        Schema::connection('central')->create('domains', function ($table) {
+            $table->id();
+            $table->foreignId('tenant_id');
+            $table->string('domain');
+            $table->boolean('is_primary')->default(false);
+        });
+
         // Create test tenant with :memory: database for SQLite
-        Tenant::on('central')->create([
+        $tenant = Tenant::on('central')->create([
             'id' => 1,
             'slug' => 'acme',
-            'domain' => 'acme',
             'database_name' => ':memory:',
+        ]);
+
+        // Create domain for tenant
+        Domain::on('central')->create([
+            'tenant_id' => $tenant->id,
+            'domain' => 'acme',
+            'is_primary' => true,
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_completes_full_tenant_flow(): void
     {
         Event::fake();
@@ -82,7 +98,7 @@ class TenantFlowTest extends TestCase
         $this->assertEquals('central', DB::getDefaultConnection());
     }
 
-    /** @test */
+    #[Test]
     public function it_stays_on_central_for_central_domain(): void
     {
         Event::fake();

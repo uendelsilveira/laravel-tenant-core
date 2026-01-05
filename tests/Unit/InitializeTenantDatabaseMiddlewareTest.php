@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -22,7 +24,7 @@ use UendelSilveira\TenantCore\Tests\TestCase;
 
 class InitializeTenantDatabaseMiddlewareTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_connects_to_tenant_database_when_tenant_is_set(): void
     {
         Event::fake();
@@ -55,7 +57,7 @@ class InitializeTenantDatabaseMiddlewareTest extends TestCase
         Event::assertDispatched(TenantEnded::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_does_not_connect_when_no_tenant_is_set(): void
     {
         Event::fake();

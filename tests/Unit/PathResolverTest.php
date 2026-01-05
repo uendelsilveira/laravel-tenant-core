@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use UendelSilveira\TenantCore\Resolvers\PathResolver;
@@ -33,7 +35,7 @@ class PathResolverTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_tenant_from_path(): void
     {
         // Create a test tenant
@@ -52,7 +54,7 @@ class PathResolverTest extends TestCase
         $this->assertEquals('acme', $tenant->slug);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_for_empty_path(): void
     {
         $request = Request::create('http://example.com/');
@@ -62,7 +64,7 @@ class PathResolverTest extends TestCase
         $this->assertNull($tenant);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_for_non_existent_tenant(): void
     {
         $request = Request::create('http://example.com/nonexistent/page');

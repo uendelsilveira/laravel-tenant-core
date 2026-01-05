@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use UendelSilveira\TenantCore\Resolvers\HeaderResolver;
@@ -33,7 +35,7 @@ class HeaderResolverTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_tenant_from_id_header(): void
     {
         // Create a test tenant
@@ -53,7 +55,7 @@ class HeaderResolverTest extends TestCase
         $this->assertEquals(1, $tenant->id);
     }
 
-    /** @test */
+    #[Test]
     public function it_resolves_tenant_from_slug_header(): void
     {
         // Create a test tenant
@@ -73,7 +75,7 @@ class HeaderResolverTest extends TestCase
         $this->assertEquals('acme', $tenant->slug);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_when_no_header_present(): void
     {
         $request = Request::create('http://example.com/api/test');
@@ -83,7 +85,7 @@ class HeaderResolverTest extends TestCase
         $this->assertNull($tenant);
     }
 
-    /** @test */
+    #[Test]
     public function it_returns_null_for_non_existent_tenant(): void
     {
         $request = Request::create('http://example.com/api/test');

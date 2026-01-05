@@ -9,6 +9,8 @@
 
 namespace UendelSilveira\TenantCore\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
+
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use UendelSilveira\TenantCore\Contracts\TenantContextContract;
@@ -18,7 +20,7 @@ use UendelSilveira\TenantCore\Tests\TestCase;
 
 class EnsureTenantMiddlewareTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_allows_request_when_tenant_is_set(): void
     {
         $tenant = new Tenant([
@@ -40,7 +42,7 @@ class EnsureTenantMiddlewareTest extends TestCase
         $this->assertEquals('OK', $response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_exception_when_no_tenant_is_set(): void
     {
         $this->expectException(NotFoundHttpException::class);
